@@ -1,11 +1,18 @@
 package com.example.movie.ui
 
+import android.os.Build
+import androidx.annotation.RequiresApi
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.text.KeyboardOptions
 import androidx.compose.material.*
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.*
+import androidx.compose.material3.DatePicker
+import androidx.compose.material3.DatePickerDialog
+import androidx.compose.material3.ExperimentalMaterial3Api
+import androidx.compose.material3.TextButton
+import androidx.compose.material3.rememberDatePickerState
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
@@ -17,7 +24,13 @@ import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
 import com.example.movie.data.MockMovieApi
 import kotlinx.coroutines.launch
+import java.time.Instant
+import java.time.LocalDate
+import java.time.ZoneId
+import java.time.format.DateTimeFormatter
 
+@RequiresApi(Build.VERSION_CODES.O)
+@OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun SignUpScreen(navController: NavHostController) {
     var username by remember { mutableStateOf("") }
@@ -28,8 +41,42 @@ fun SignUpScreen(navController: NavHostController) {
     var passwordVisible by remember { mutableStateOf(false) }
     var errorMessage by remember { mutableStateOf("") }
     var isLoading by remember { mutableStateOf(false) }
+    var showDatePicker by remember { mutableStateOf(false) }
 
     val scope = rememberCoroutineScope()
+
+    // Date picker state
+    val datePickerState = rememberDatePickerState()
+
+    // Handle date selection
+    if (showDatePicker) {
+        DatePickerDialog(
+            onDismissRequest = { showDatePicker = false },
+            confirmButton = {
+                TextButton(
+                    onClick = {
+                        val selectedDateMillis = datePickerState.selectedDateMillis
+                        if (selectedDateMillis != null) {
+                            val selectedDate = Instant.ofEpochMilli(selectedDateMillis)
+                                .atZone(ZoneId.systemDefault())
+                                .toLocalDate()
+                            birthDate = selectedDate.format(DateTimeFormatter.ofPattern("dd/MM/yyyy"))
+                        }
+                        showDatePicker = false
+                    }
+                ) {
+                    Text("OK")
+                }
+            },
+            dismissButton = {
+                TextButton(onClick = { showDatePicker = false }) {
+                    Text("Cancel")
+                }
+            }
+        ) {
+            DatePicker(state = datePickerState)
+        }
+    }
 
     Column(
         modifier = Modifier
@@ -68,7 +115,7 @@ fun SignUpScreen(navController: NavHostController) {
             label = { Text("Birth of date") },
             modifier = Modifier.fillMaxWidth(),
             trailingIcon = {
-                IconButton(onClick = { /* TODO: Implement date picker */ }) {
+                IconButton(onClick = { showDatePicker = true }) {
                     Icon(Icons.Default.DateRange, contentDescription = "Select date")
                 }
             }
@@ -85,7 +132,7 @@ fun SignUpScreen(navController: NavHostController) {
             leadingIcon = {
                 Row {
                     Icon(Icons.Default.Phone, contentDescription = "Country code")
-                    Text("+4") // Placeholder for country code selector
+                    Text("+98") // Placeholder for country code selector
                 }
             }
         )
