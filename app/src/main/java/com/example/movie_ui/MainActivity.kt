@@ -42,7 +42,7 @@ fun HomeScreen(navController: NavHostController) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("home") {
-                HomeContent()
+                HomeContent(navController = navController)
             }
             composable("profile") {
                 ProfileScreen(navController = navController)
@@ -55,12 +55,12 @@ fun HomeScreen(navController: NavHostController) {
                 arguments = listOf(navArgument("id") { type = NavType.StringType })
             ) { backStackEntry ->
                 val movieId = backStackEntry.arguments?.getString("id") ?: "Unknown"
-                // Note: In a real app, you'd need to pass the movie list from DiscoverScreen to MainActivity
-                // For simplicity, we'll assume the movie list is available in a ViewModel or passed via navigation
-                MovieDetailsScreen(
-                    movie = MockMovieApi.discoverMovies.find { it.id == movieId } ?: MockMovieApi.discoverMovies.first(),
-                    navController = navController
-                )
+                // Fetch movie from all possible sources (topFive, latest, or discover as fallback)
+                val movie = MockMovieApi.topFiveMovies.find { it.id == movieId }
+                    ?: MockMovieApi.latestMovies.find { it.id == movieId }
+                    ?: MockMovieApi.discoverMovies.find { it.id == movieId }
+                    ?: MockMovieApi.discoverMovies.first() // Fallback to first movie if not found
+                MovieDetailsScreen(movie = movie, navController = navController)
             }
         }
     }

@@ -1,6 +1,7 @@
 package com.example.movie_ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
@@ -15,10 +16,11 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import androidx.navigation.NavHostController
 import kotlinx.coroutines.launch
 
 @Composable
-fun HomeContent() {
+fun HomeContent(navController: NavHostController) {
     // State for top five and latest movies
     var topFiveMovies by remember { mutableStateOf<List<Movie>>(emptyList()) }
     var latestMovies by remember { mutableStateOf<List<Movie>>(emptyList()) }
@@ -74,7 +76,7 @@ fun HomeContent() {
                     color = Color.Gray
                 )
             } else {
-                TopFiveSlider(movies = topFiveMovies)
+                TopFiveSlider(movies = topFiveMovies, navController = navController)
             }
 
             // Middle section (fixed height)
@@ -95,7 +97,7 @@ fun HomeContent() {
                         color = Color.Gray
                     )
                 } else {
-                    LatestMovies(movies = latestMovies)
+                    LatestMovies(movies = latestMovies, navController = navController)
                 }
             }
         }
@@ -103,7 +105,7 @@ fun HomeContent() {
 }
 
 @Composable
-fun TopFiveSlider(movies: List<Movie>) {
+fun TopFiveSlider(movies: List<Movie>, navController: NavHostController) {
     Box(
         modifier = Modifier
             .height(300.dp) // Static height for Top Five section
@@ -114,18 +116,19 @@ fun TopFiveSlider(movies: List<Movie>) {
             horizontalArrangement = Arrangement.spacedBy(16.dp)
         ) {
             items(movies.size) { index ->
-                MovieItem(movie = movies[index])
+                MovieItem(movie = movies[index], navController = navController)
             }
         }
     }
 }
 
 @Composable
-fun MovieItem(movie: Movie) {
+fun MovieItem(movie: Movie, navController: NavHostController) {
     Column(
         modifier = Modifier
             .width(200.dp)
-            .padding(vertical = 8.dp),
+            .padding(vertical = 8.dp)
+            .clickable { navController.navigate("movieDetails/${movie.id}") },
         horizontalAlignment = Alignment.CenterHorizontally
     ) {
         Box(
@@ -166,24 +169,25 @@ fun MovieItem(movie: Movie) {
 }
 
 @Composable
-fun LatestMovies(movies: List<Movie>) {
+fun LatestMovies(movies: List<Movie>, navController: NavHostController) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
         items(movies.size) { index ->
-            LatestMovieItem(movie = movies[index])
+            LatestMovieItem(movie = movies[index], navController = navController)
         }
     }
 }
 
 @Composable
-fun LatestMovieItem(movie: Movie) {
+fun LatestMovieItem(movie: Movie, navController: NavHostController) {
     Row(
         modifier = Modifier
             .fillMaxWidth()
             .height(IntrinsicSize.Min)
             .padding(vertical = 8.dp)
+            .clickable { navController.navigate("movieDetails/${movie.id}") }
     ) {
         Box(
             modifier = Modifier
