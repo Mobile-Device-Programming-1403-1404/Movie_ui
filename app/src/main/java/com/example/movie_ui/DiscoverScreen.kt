@@ -1,6 +1,7 @@
 package com.example.movie_ui
 
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -73,7 +74,8 @@ fun DiscoverScreen(navController: NavHostController) {
                     items(6) { index ->
                         MovieGridItem(
                             title = "Hitman's Wife's Bodyguard",
-                            rating = 3.5f
+                            rating = 3.5f,
+                            navController
                         )
                     }
                 }
@@ -83,12 +85,13 @@ fun DiscoverScreen(navController: NavHostController) {
 }
 
 @Composable
-fun MovieGridItem(title: String, rating: Float) {
+fun MovieGridItem(title: String, rating: Float, navController: NavHostController) {
     Column(
         horizontalAlignment = Alignment.CenterHorizontally,
         modifier = Modifier
             .width(150.dp)
             .padding(8.dp)
+            .clickable { navController.navigate("movieDetails/1") } // Pass actual movie ID
     ) {
         Box(
             modifier = Modifier
