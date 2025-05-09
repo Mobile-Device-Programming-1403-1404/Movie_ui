@@ -42,7 +42,7 @@ fun HomeScreen(navController: NavHostController) {
             modifier = Modifier.padding(innerPadding)
         ) {
             composable("home") { HomeContent() }
-            composable("profile") { ProfileScreen() }
+            composable("profile") { ProfileScreen(navController = navController) }
             composable("discover") { DiscoverScreen(navController = navController) }
             composable(
                 route = "movieDetails/{movieId}",
