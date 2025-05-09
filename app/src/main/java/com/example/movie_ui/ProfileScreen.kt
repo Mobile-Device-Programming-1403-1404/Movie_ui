@@ -44,12 +44,7 @@ fun ProfileScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Profile.", fontSize = 24.sp, fontWeight = FontWeight.Bold) },
-                navigationIcon = {
-                    IconButton(onClick = { navController.popBackStack() }) {
-                        Icon(Icons.Default.ArrowBack, contentDescription = "Back")
-                    }
-                }
+                title = { Text("Profile.", fontSize = 24.sp, fontWeight = FontWeight.Bold) }
             )
         },
         content = { innerPadding ->
