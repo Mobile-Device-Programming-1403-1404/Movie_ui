@@ -21,10 +21,12 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiscoverScreen(navController: NavHostController) {
-    // State for movies and loading
+    // State for movies, loading, selected tab, and search query
     var movies by remember { mutableStateOf<List<Movie>>(emptyList()) }
+    var allMovies by remember { mutableStateOf<List<Movie>>(emptyList()) } // Store unfiltered movies
     var isLoading by remember { mutableStateOf(true) }
     var selectedTabIndex by remember { mutableStateOf(0) }
+    var searchQuery by remember { mutableStateOf("") }
 
     // Define tabs and their corresponding categories
     val tabs = listOf("ALL", "ANIMATION", "ACTION")
@@ -38,8 +40,9 @@ fun DiscoverScreen(navController: NavHostController) {
         scope.launch {
             try {
                 isLoading = true
-                val allMovies = MockMovieApi.getDiscoverMovies("ALL")
-                movies = allMovies
+                val allMoviesData = MockMovieApi.getDiscoverMovies("ALL")
+                allMovies = allMoviesData
+                movies = allMoviesData // Initial display of all movies
             } finally {
                 isLoading = false
             }
@@ -50,7 +53,25 @@ fun DiscoverScreen(navController: NavHostController) {
     LaunchedEffect(selectedTabIndex) {
         scope.launch {
             val category = categories[selectedTabIndex]
-            movies = MockMovieApi.getDiscoverMovies(category)
+            movies = if (searchQuery.isEmpty()) {
+                MockMovieApi.getDiscoverMovies(category)
+            } else {
+                allMovies.filter { it.title.contains(searchQuery, ignoreCase = true) || it.genres.contains(searchQuery, ignoreCase = true) }
+                    .filter { category == "ALL" || it.genres.contains(category, ignoreCase = true) }
+            }
+        }
+    }
+
+    // Update movies based on search query
+    LaunchedEffect(searchQuery) {
+        scope.launch {
+            val category = categories[selectedTabIndex]
+            movies = if (searchQuery.isEmpty()) {
+                MockMovieApi.getDiscoverMovies(category)
+            } else {
+                allMovies.filter { it.title.contains(searchQuery, ignoreCase = true) || it.genres.contains(searchQuery, ignoreCase = true) }
+                    .filter { category == "ALL" || it.genres.contains(category, ignoreCase = true) }
+            }
         }
     }
 
@@ -71,8 +92,8 @@ fun DiscoverScreen(navController: NavHostController) {
             ) {
                 // Search Bar
                 OutlinedTextField(
-                    value = "",
-                    onValueChange = { /* Handle search input */ },
+                    value = searchQuery,
+                    onValueChange = { searchQuery = it },
                     leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
                     placeholder = { Text("Search...") },
                     modifier = Modifier
