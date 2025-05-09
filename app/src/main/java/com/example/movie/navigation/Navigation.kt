@@ -12,6 +12,8 @@ import androidx.navigation.NavHostController
 import androidx.navigation.compose.currentBackStackEntryAsState
 
 object Destinations {
+    const val LOGIN = "login"
+    const val SIGNUP = "signup"
     const val HOME = "home"
     const val PROFILE = "profile"
     const val DISCOVER = "discover"

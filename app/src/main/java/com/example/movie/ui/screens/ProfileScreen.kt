@@ -23,15 +23,12 @@ import com.example.movie.model.Profile
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen() { // Added navController parameter
-    // State for profile data and loading
+fun ProfileScreen() {
     var profile by remember { mutableStateOf<Profile?>(null) }
     var isLoading by remember { mutableStateOf(true) }
 
-    // Coroutine scope for launching API calls
     val scope = rememberCoroutineScope()
 
-    // Fetch profile data when the composable is first loaded
     LaunchedEffect(Unit) {
         NetworkUtils.fetchData(
             scope = scope,
@@ -41,7 +38,7 @@ fun ProfileScreen() { // Added navController parameter
                 isLoading = false
             },
             onError = { isLoading = false },
-            fetch = { listOf(MockMovieApi.getProfile()) }
+            fetch = { MockMovieApi.getProfile() } // Now a suspend function
         )
     }
 
@@ -67,7 +64,6 @@ fun ProfileScreen() { // Added navController parameter
                         CircularProgressIndicator()
                     }
                 } else if (profile != null) {
-                    // Profile Header
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -92,7 +88,6 @@ fun ProfileScreen() { // Added navController parameter
                         )
                     }
 
-                    // Stats Section
                     Row(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -125,7 +120,6 @@ fun ProfileScreen() { // Added navController parameter
                         }
                     }
 
-                    // Details Section
                     Box(
                         modifier = Modifier
                             .fillMaxWidth()
@@ -186,7 +180,7 @@ fun ProfileScreen() { // Added navController parameter
                     Text(
                         text = "Failed to load profile.",
                         fontSize = 16.sp,
-                        color = Color.Red,
+                        color = Color.Red
                     )
                 }
             }

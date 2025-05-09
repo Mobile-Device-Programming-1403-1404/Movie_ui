@@ -2,6 +2,7 @@ package com.example.movie.data
 
 import com.example.movie.model.Movie
 import com.example.movie.model.Profile
+import com.example.movie.model.User
 import kotlinx.coroutines.delay
 
 object MockMovieApi {
@@ -14,16 +15,7 @@ object MockMovieApi {
     )
 
     val latestMovies = listOf(
-        Movie("6", "Hitman's Wife's Bodyguard", 3.5f, "Action, Comedy, Crime", "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on another...", "https://example.com/hitman.jpg")
-    )
-
-    private val profile = Profile(
-        username = "Artaz",
-        averageRating = 4.3f,
-        downloadedMovies = 37,
-        email = "CallMeArtaz@gmail.com",
-        birthDate = "2024/12/03",
-        phoneNumber = "+98 913 111 111"
+        Movie("6", "Hitman's Wife's Bodyguard", 3.5f, "Action, Comedy, Crime", "The world's most lethal odd couple...", "https://example.com/hitman.jpg")
     )
 
     val discoverMovies = listOf(
@@ -35,6 +27,8 @@ object MockMovieApi {
         Movie("12", "Toy Story", 4.3f, "Animation, Family", "Toys come to life...", "https://example.com/toystory.jpg")
     )
 
+    private val users = mutableListOf<User>()
+
     suspend fun getTopFiveMovies(): List<Movie> {
         delay(1000)
         return topFiveMovies
@@ -45,11 +39,6 @@ object MockMovieApi {
         return latestMovies
     }
 
-    suspend fun getProfile(): Profile {
-        delay(1000)
-        return profile
-    }
-
     suspend fun getDiscoverMovies(category: String): List<Movie> {
         delay(1000)
         return when (category) {
@@ -57,6 +46,39 @@ object MockMovieApi {
             "ANIMATION" -> discoverMovies.filter { it.genres.contains("Animation", ignoreCase = true) }
             "ACTION" -> discoverMovies.filter { it.genres.contains("Action", ignoreCase = true) }
             else -> emptyList()
+        }
+    }
+
+    suspend fun signUp(email: String, password: String, username: String, birthDate: String, phoneNumber: String): Boolean {
+        delay(1000)
+        return if (users.any { it.email == email }) {
+            false // User already exists
+        } else {
+            users.add(User(email, password, username, birthDate, phoneNumber))
+            true // Successfully registered
+        }
+    }
+
+    suspend fun login(emailOrUsername: String, password: String): Boolean {
+        delay(1000)
+        return users.any { (it.email == emailOrUsername || it.username == emailOrUsername) && it.password == password }
+    }
+
+    suspend fun getProfile(): List<Profile> {
+        delay(1000)
+        return if (users.isNotEmpty()) {
+            listOf(
+                Profile(
+                    username = users.first().username,
+                    email = users.first().email,
+                    birthDate = users.first().birthDate,
+                    phoneNumber = users.first().phoneNumber,
+                    averageRating = 4.5f,
+                    downloadedMovies = 10
+                )
+            )
+        } else {
+            emptyList()
         }
     }
 }

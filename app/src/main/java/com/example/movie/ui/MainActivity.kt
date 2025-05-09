@@ -7,12 +7,15 @@ import androidx.activity.enableEdgeToEdge
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.padding
 import androidx.compose.material3.Scaffold
+import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.getValue
 import androidx.compose.ui.Modifier
 import androidx.navigation.NavHostController
 import androidx.navigation.NavType
 import androidx.navigation.compose.NavHost
 import androidx.navigation.compose.composable
+import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
 import com.example.movie.data.MockMovieApi
@@ -22,14 +25,14 @@ import com.example.movie.ui.screens.DiscoverScreen
 import com.example.movie.ui.screens.HomeScreen
 import com.example.movie.ui.screens.MovieDetailsScreen
 import com.example.movie.ui.screens.ProfileScreen
-import com.example.movie.ui.theme.MovieTheme // Updated theme import
+import com.example.movie.ui.theme.MovieTheme
 
 class MainActivity : ComponentActivity() {
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
         enableEdgeToEdge()
         setContent {
-            MovieTheme { // Updated theme call
+            MovieTheme {
                 val navController = rememberNavController()
                 MainScreen(navController = navController)
             }
@@ -39,23 +42,40 @@ class MainActivity : ComponentActivity() {
 
 @Composable
 fun MainScreen(navController: NavHostController) {
+    val currentRoute by navController.currentBackStackEntryAsState()
+    val showBottomBar = currentRoute?.destination?.route in listOf(
+        Destinations.HOME,
+        Destinations.DISCOVER,
+        Destinations.PROFILE
+    )
+
     Scaffold(
         modifier = Modifier.fillMaxSize(),
-        bottomBar = { BottomNavigationBar(navController = navController) }
+        bottomBar = {
+            if (showBottomBar) {
+                BottomNavigationBar(navController = navController)
+            }
+        }
     ) { innerPadding ->
         NavHost(
             navController = navController,
-            startDestination = Destinations.HOME,
+            startDestination = Destinations.LOGIN,
             modifier = Modifier.padding(innerPadding)
         ) {
+            composable(Destinations.LOGIN) {
+                LoginScreen(navController)
+            }
+            composable(Destinations.SIGNUP) {
+                SignUpScreen(navController)
+            }
             composable(Destinations.HOME) {
-                HomeScreen(navController = navController)
+                HomeScreen(navController)
             }
             composable(Destinations.PROFILE) {
-                ProfileScreen() // No navController needed, as per updated signature
+                ProfileScreen()
             }
             composable(Destinations.DISCOVER) {
-                DiscoverScreen(navController = navController)
+                DiscoverScreen(navController)
             }
             composable(
                 Destinations.MOVIE_DETAILS,
@@ -65,8 +85,12 @@ fun MainScreen(navController: NavHostController) {
                 val movie = MockMovieApi.topFiveMovies.find { it.id == movieId }
                     ?: MockMovieApi.latestMovies.find { it.id == movieId }
                     ?: MockMovieApi.discoverMovies.find { it.id == movieId }
-                    ?: MockMovieApi.discoverMovies.first()
-                MovieDetailsScreen(movie = movie, navController = navController)
+                    ?: MockMovieApi.discoverMovies.firstOrNull()
+                if (movie != null) {
+                    MovieDetailsScreen(movie = movie, navController = navController)
+                } else {
+                    Text("Movie not found", modifier = Modifier.fillMaxSize())
+                }
             }
         }
     }

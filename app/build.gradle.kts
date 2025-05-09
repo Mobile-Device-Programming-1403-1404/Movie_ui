@@ -57,6 +57,7 @@ dependencies {
     implementation(libs.androidx.material)
     implementation(libs.androidx.recyclerview)
     implementation(libs.androidx.fragment.ktx)
+    implementation(libs.androidx.animation.lint)
     testImplementation(libs.junit)
     androidTestImplementation(libs.androidx.junit)
     androidTestImplementation(libs.androidx.espresso.core)
@@ -69,4 +70,6 @@ dependencies {
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-core:1.7.3")
     implementation ("androidx.navigation:navigation-compose:2.7.5")
     implementation ("org.jetbrains.kotlin:kotlin-parcelize-runtime:1.9.0")
+    implementation ("androidx.compose.material:material-icons-extended:1.5.0")
+    implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
 }
