@@ -41,32 +41,27 @@ fun HomeScreen(navController: NavHostController) {
             startDestination = "home",
             modifier = Modifier.padding(innerPadding)
         ) {
-            composable("home") { HomeContent() }
-            composable("profile") { ProfileScreen(navController = navController) }
-            composable("discover") { DiscoverScreen(navController = navController) }
+            composable("home") {
+                HomeContent()
+            }
+            composable("profile") {
+                ProfileScreen(navController = navController)
+            }
+            composable("discover") {
+                DiscoverScreen(navController = navController)
+            }
             composable(
-                route = "movieDetails/{movieId}",
-                arguments = listOf(navArgument("movieId") { type = NavType.StringType })
+                "movieDetails/{id}",
+                arguments = listOf(navArgument("id") { type = NavType.StringType })
             ) { backStackEntry ->
-                val movieId = backStackEntry.arguments?.getString("movieId")
-                // Replace with your actual movie data source
+                val movieId = backStackEntry.arguments?.getString("id") ?: "Unknown"
+                // Note: In a real app, you'd need to pass the movie list from DiscoverScreen to MainActivity
+                // For simplicity, we'll assume the movie list is available in a ViewModel or passed via navigation
                 MovieDetailsScreen(
-                    movie = getSampleMovie(movieId ?: "1"),
+                    movie = MockMovieApi.discoverMovies.find { it.id == movieId } ?: MockMovieApi.discoverMovies.first(),
                     navController = navController
                 )
             }
         }
     }
-}
-
-fun getSampleMovie(id: String): Movie {
-    return Movie(
-        id = id,
-        title = "Hitman's Wife's Bodyguard",
-        rating = 3.5f,
-        genres = "Action, Comedy, Crime",
-        description = "The world's most lethal odd couple – bodyguard Michael Bryce and hitman Darius Kincaid are back on another life-threatening mission. The trio is forced to team up when Darius's wife, the infamous international con artist Sonia Kincaid, is kidnapped.",
-        imageUrl = null,
-        backdropUrl = null
-    )
 }

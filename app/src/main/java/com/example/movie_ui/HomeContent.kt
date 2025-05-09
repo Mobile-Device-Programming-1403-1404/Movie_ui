@@ -5,8 +5,9 @@ import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyRow
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.material3.CircularProgressIndicator
 import androidx.compose.material3.Text
-import androidx.compose.runtime.Composable
+import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
@@ -14,49 +15,95 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
+import kotlinx.coroutines.launch
 
 @Composable
 fun HomeContent() {
+    // State for top five and latest movies
+    var topFiveMovies by remember { mutableStateOf<List<Movie>>(emptyList()) }
+    var latestMovies by remember { mutableStateOf<List<Movie>>(emptyList()) }
+    var isLoading by remember { mutableStateOf(true) }
+
+    // Coroutine scope for launching API calls
+    val scope = rememberCoroutineScope()
+
+    // Fetch data when the composable is first loaded
+    LaunchedEffect(Unit) {
+        scope.launch {
+            try {
+                // Fetch top five movies
+                val topFive = MockMovieApi.getTopFiveMovies()
+                topFiveMovies = topFive
+
+                // Fetch latest movies
+                val latest = MockMovieApi.getLatestMovies()
+                latestMovies = latest
+            } finally {
+                isLoading = false
+            }
+        }
+    }
+
     Column(
         modifier = Modifier
             .fillMaxSize()
             .padding(horizontal = 16.dp)
     ) {
-        // Header section (fixed height)
-        Text(
-            text = "Top five.",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(16.dp))
-        TopFiveSlider()
+        if (isLoading) {
+            // Show loading indicator while fetching data
+            Box(
+                modifier = Modifier
+                    .fillMaxSize(),
+                contentAlignment = Alignment.Center
+            ) {
+                CircularProgressIndicator()
+            }
+        } else {
+            // Header section (fixed height)
+            Text(
+                text = "Top five.",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(16.dp))
 
-        // Middle section (fixed height)
-        Spacer(modifier = Modifier.height(24.dp))
-        Text(
-            text = "Latest.",
-            fontSize = 24.sp,
-            fontWeight = FontWeight.Bold
-        )
-        Spacer(modifier = Modifier.height(16.dp))
+            if (topFiveMovies.isEmpty()) {
+                Text(
+                    text = "No top five movies available.",
+                    fontSize = 16.sp,
+                    color = Color.Gray
+                )
+            } else {
+                TopFiveSlider(movies = topFiveMovies)
+            }
 
-        // List section (takes remaining space)
-        Box(modifier = Modifier.weight(1f)) {
-            LatestMovies()
+            // Middle section (fixed height)
+            Spacer(modifier = Modifier.height(24.dp))
+            Text(
+                text = "Latest.",
+                fontSize = 24.sp,
+                fontWeight = FontWeight.Bold
+            )
+            Spacer(modifier = Modifier.height(16.dp))
+
+            // List section (takes remaining space)
+            Box(modifier = Modifier.weight(1f)) {
+                if (latestMovies.isEmpty()) {
+                    Text(
+                        text = "No latest movies available.",
+                        fontSize = 16.sp,
+                        color = Color.Gray
+                    )
+                } else {
+                    LatestMovies(movies = latestMovies)
+                }
+            }
         }
     }
 }
 
 @Composable
-fun TopFiveSlider() {
-    val movies = listOf(
-        Movie("1","Hitman's Wife's Bodyguard", 3.5f, "Action, Comedy, Crime", "The world's most lethal odd couple...", "https://example.com/hitman.jpg"),
-        Movie("2","Movie 2 with a Very Long Title That Should Be Truncated", 4.0f, "Action, Drama", "Description for Movie 2...", "https://example.com/movie2.jpg"),
-        Movie("3","Movie 3", 3.8f, "Comedy, Thriller", "Description for Movie 3...", "https://example.com/movie3.jpg"),
-        Movie("4","Movie 4", 4.2f, "Action, Sci-Fi", "Description for Movie 4...", "https://example.com/movie4.jpg"),
-        Movie("5","Movie 5", 3.9f, "Drama, Romance", "Description for Movie 5...", "https://example.com/movie5.jpg")
-    )
-
+fun TopFiveSlider(movies: List<Movie>) {
     Box(
         modifier = Modifier
             .height(300.dp) // Static height for Top Five section
@@ -119,19 +166,13 @@ fun MovieItem(movie: Movie) {
 }
 
 @Composable
-fun LatestMovies() {
-    val latestMovies = listOf(
-        Movie("1","Hitman's Wife's Bodyguard", 3.5f, "Action, Comedy, Crime",
-            "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on another...",
-            "https://example.com/hitman.jpg")
-    )
-
+fun LatestMovies(movies: List<Movie>) {
     LazyColumn(
         modifier = Modifier.fillMaxSize(),
         verticalArrangement = Arrangement.spacedBy(16.dp)
     ) {
-        items(latestMovies.size) { index ->
-            LatestMovieItem(movie = latestMovies[index])
+        items(movies.size) { index ->
+            LatestMovieItem(movie = movies[index])
         }
     }
 }

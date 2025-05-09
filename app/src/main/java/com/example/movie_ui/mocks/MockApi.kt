@@ -1,23 +1,64 @@
-package com.example.movie_ui.mocks
+package com.example.movie_ui
 
-import com.example.movie_ui.Movie
+import kotlinx.coroutines.delay
 
-object MockApi {
-    fun getTopFiveMovies(): List<Movie> {
-        return listOf(
-            Movie("1","Hitman's Wife's Bodyguard", 3.5f, "Action, Comedy, Crime", "The world's most lethal odd couple...", "https://example.com/hitman.jpg"),
-            Movie("2","Movie 2 with a Very Long Title That Should Be Truncated", 4.0f, "Action, Drama", "Description for Movie 2...", "https://example.com/movie2.jpg"),
-            Movie("3","Movie 3", 3.8f, "Comedy, Thriller", "Description for Movie 3...", "https://example.com/movie3.jpg"),
-            Movie("4","Movie 4", 4.2f, "Action, Sci-Fi", "Description for Movie 4...", "https://example.com/movie4.jpg"),
-            Movie("5","Movie 5", 3.9f, "Drama, Romance", "Description for Movie 5...", "https://example.com/movie5.jpg")
-        )
+object MockMovieApi {
+    private val topFiveMovies = listOf(
+        Movie("1", "Hitman's Wife's Bodyguard", 3.5f, "Action, Comedy, Crime", "The world's most lethal odd couple...", "https://example.com/hitman.jpg"),
+        Movie("2", "Movie 2 with a Very Long Title That Should Be Truncated", 4.0f, "Action, Drama", "Description for Movie 2...", "https://example.com/movie2.jpg"),
+        Movie("3", "Movie 3", 3.8f, "Comedy, Thriller", "Description for Movie 3...", "https://example.com/movie3.jpg"),
+        Movie("4", "Movie 4", 4.2f, "Action, Sci-Fi", "Description for Movie 4...", "https://example.com/movie4.jpg"),
+        Movie("5", "Movie 5", 3.9f, "Drama, Romance", "Description for Movie 5...", "https://example.com/movie5.jpg")
+    )
+
+    private val latestMovies = listOf(
+        Movie("1", "Hitman's Wife's Bodyguard", 3.5f, "Action, Comedy, Crime", "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on another...", "https://example.com/hitman.jpg")
+    )
+
+    private val profile = Profile(
+        username = "Artaz",
+        averageRating = 4.3f,
+        downloadedMovies = 37,
+        email = "CallMeArtaz@gmail.com",
+        birthDate = "2024/12/03",
+        phoneNumber = "+98 913 111 111"
+    )
+
+    val discoverMovies = listOf(
+        Movie("1", "Hitman's Wife's Bodyguard", 3.5f, "Action, Comedy, Crime", "The world's most lethal odd couple...", "https://example.com/hitman.jpg"),
+        Movie("2", "The Incredibles", 4.1f, "Animation, Action, Adventure", "A family of superheroes...", "https://example.com/incredibles.jpg"),
+        Movie("3", "Die Hard", 4.0f, "Action, Thriller", "A cop battles terrorists...", "https://example.com/diehard.jpg"),
+        Movie("4", "Finding Nemo", 4.2f, "Animation, Family", "A clownfish searches for his son...", "https://example.com/nemo.jpg"),
+        Movie("5", "Mission: Impossible", 3.9f, "Action, Thriller", "A spy on an impossible mission...", "https://example.com/missionimpossible.jpg"),
+        Movie("6", "Toy Story", 4.3f, "Animation, Family", "Toys come to life...", "https://example.com/toystory.jpg")
+    )
+
+    // Simulate fetching top five movies with a delay
+    suspend fun getTopFiveMovies(): List<Movie> {
+        delay(1000) // Simulate network delay of 1 second
+        return topFiveMovies
     }
 
-    fun getLatestMovies(): List<Movie> {
-        return listOf(
-            Movie("1","Hitman's Wife's Bodyguard", 3.5f, "Action, Comedy, Crime",
-                "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on another...",
-                "https://example.com/hitman.jpg")
-        )
+    // Simulate fetching latest movies with a delay
+    suspend fun getLatestMovies(): List<Movie> {
+        delay(1000) // Simulate network delay of 1 second
+        return latestMovies
+    }
+
+    // Simulate fetching profile data with a delay
+    suspend fun getProfile(): Profile {
+        delay(1000) // Simulate network delay of 1 second
+        return profile
+    }
+
+    // Simulate fetching discover movies with a delay, filtered by category
+    suspend fun getDiscoverMovies(category: String): List<Movie> {
+        delay(1000) // Simulate network delay of 1 second
+        return when (category) {
+            "ALL" -> discoverMovies
+            "ANIMATION" -> discoverMovies.filter { it.genres.contains("Animation", ignoreCase = true) }
+            "ACTION" -> discoverMovies.filter { it.genres.contains("Action", ignoreCase = true) }
+            else -> emptyList()
+        }
     }
 }
