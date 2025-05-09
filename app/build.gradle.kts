@@ -5,11 +5,11 @@ plugins {
 }
 
 android {
-    namespace = "com.example.movie_ui"
+    namespace = "com.example.movie"
     compileSdk = 35
 
     defaultConfig {
-        applicationId = "com.example.movie_ui"
+        applicationId = "com.example.movie"
         minSdk = 24
         targetSdk = 35
         versionCode = 1

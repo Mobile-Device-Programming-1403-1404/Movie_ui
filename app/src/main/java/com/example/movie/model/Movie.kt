@@ -1,4 +1,4 @@
-package com.example.movie_ui
+package com.example.movie.model
 
 import android.os.Parcel
 import android.os.Parcelable
@@ -21,12 +21,3 @@ data class Movie(
         TODO("Not yet implemented")
     }
 }
-
-data class Profile(
-    val username: String,
-    val averageRating: Float,
-    val downloadedMovies: Int,
-    val email: String,
-    val birthDate: String,
-    val phoneNumber: String
-)

@@ -1,7 +1,5 @@
-package com.example.movie_ui
+package com.example.movie.ui.screens
 
-import androidx.compose.foundation.background
-import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
@@ -16,6 +14,10 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.movie.data.MockMovieApi
+import com.example.movie.data.NetworkUtils
+import com.example.movie.model.Movie
+import com.example.movie.ui.components.MovieGridItem
 import kotlinx.coroutines.launch
 
 @OptIn(ExperimentalMaterial3Api::class)
@@ -23,7 +25,7 @@ import kotlinx.coroutines.launch
 fun DiscoverScreen(navController: NavHostController) {
     // State for movies, loading, selected tab, and search query
     var movies by remember { mutableStateOf<List<Movie>>(emptyList()) }
-    var allMovies by remember { mutableStateOf<List<Movie>>(emptyList()) } // Store unfiltered movies
+    var allMovies by remember { mutableStateOf<List<Movie>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
     var selectedTabIndex by remember { mutableStateOf(0) }
     var searchQuery by remember { mutableStateOf("") }
@@ -37,33 +39,21 @@ fun DiscoverScreen(navController: NavHostController) {
 
     // Fetch all movies when the composable is first loaded
     LaunchedEffect(Unit) {
-        scope.launch {
-            try {
-                isLoading = true
-                val allMoviesData = MockMovieApi.getDiscoverMovies("ALL")
-                allMovies = allMoviesData
-                movies = allMoviesData // Initial display of all movies
-            } finally {
+        NetworkUtils.fetchData(
+            scope = scope,
+            onLoading = { isLoading = true },
+            onComplete = { data ->
+                allMovies = data
+                movies = data
                 isLoading = false
-            }
-        }
+            },
+            onError = { isLoading = false },
+            fetch = { MockMovieApi.getDiscoverMovies("ALL") }
+        )
     }
 
-    // Update movies based on selected tab
-    LaunchedEffect(selectedTabIndex) {
-        scope.launch {
-            val category = categories[selectedTabIndex]
-            movies = if (searchQuery.isEmpty()) {
-                MockMovieApi.getDiscoverMovies(category)
-            } else {
-                allMovies.filter { it.title.contains(searchQuery, ignoreCase = true) || it.genres.contains(searchQuery, ignoreCase = true) }
-                    .filter { category == "ALL" || it.genres.contains(category, ignoreCase = true) }
-            }
-        }
-    }
-
-    // Update movies based on search query
-    LaunchedEffect(searchQuery) {
+    // Update movies based on selected tab and search query
+    LaunchedEffect(selectedTabIndex, searchQuery) {
         scope.launch {
             val category = categories[selectedTabIndex]
             movies = if (searchQuery.isEmpty()) {
@@ -149,59 +139,11 @@ fun DiscoverScreen(navController: NavHostController) {
                         modifier = Modifier.fillMaxSize()
                     ) {
                         items(movies.size) { index ->
-                            MovieGridItem(
-                                movie = movies[index],
-                                navController = navController
-                            )
+                            MovieGridItem(movie = movies[index], navController = navController)
                         }
                     }
                 }
             }
         }
     )
-}
-
-@Composable
-fun MovieGridItem(movie: Movie, navController: NavHostController) {
-    Column(
-        horizontalAlignment = Alignment.CenterHorizontally,
-        modifier = Modifier
-            .width(150.dp)
-            .padding(8.dp)
-            .clickable {
-                navController.navigate("movieDetails/${movie.id}") // Pass movie ID
-            }
-    ) {
-        Box(
-            modifier = Modifier
-                .size(150.dp)
-                .background(Color.DarkGray, androidx.compose.foundation.shape.RoundedCornerShape(8.dp))
-        ) {
-            Text(
-                text = "Image Placeholder",
-                color = Color.White,
-                modifier = Modifier.align(Alignment.Center)
-            )
-        }
-        Spacer(modifier = Modifier.height(8.dp))
-        Text(
-            text = movie.title,
-            fontSize = 14.sp,
-            fontWeight = FontWeight.Medium,
-            maxLines = 2,
-            overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis,
-            modifier = Modifier.width(130.dp)
-        )
-        Spacer(modifier = Modifier.height(4.dp))
-        Row(
-            verticalAlignment = Alignment.CenterVertically
-        ) {
-            Text(
-                text = "${movie.rating}",
-                fontSize = 12.sp
-            )
-            Spacer(modifier = Modifier.width(4.dp))
-            RatingStars(rating = movie.rating)
-        }
-    }
 }

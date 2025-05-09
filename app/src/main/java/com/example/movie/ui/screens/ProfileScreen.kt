@@ -1,4 +1,4 @@
-package com.example.movie_ui
+package com.example.movie.ui.screens
 
 import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.*
@@ -17,11 +17,13 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import kotlinx.coroutines.launch
+import com.example.movie.data.MockMovieApi
+import com.example.movie.data.NetworkUtils
+import com.example.movie.model.Profile
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-fun ProfileScreen(navController: NavHostController) {
+fun ProfileScreen() { // Added navController parameter
     // State for profile data and loading
     var profile by remember { mutableStateOf<Profile?>(null) }
     var isLoading by remember { mutableStateOf(true) }
@@ -31,20 +33,22 @@ fun ProfileScreen(navController: NavHostController) {
 
     // Fetch profile data when the composable is first loaded
     LaunchedEffect(Unit) {
-        scope.launch {
-            try {
-                val fetchedProfile = MockMovieApi.getProfile()
-                profile = fetchedProfile
-            } finally {
+        NetworkUtils.fetchData(
+            scope = scope,
+            onLoading = { isLoading = true },
+            onComplete = { data ->
+                profile = data.firstOrNull()
                 isLoading = false
-            }
-        }
+            },
+            onError = { isLoading = false },
+            fetch = { listOf(MockMovieApi.getProfile()) }
+        )
     }
 
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Profile.", fontSize = 24.sp, fontWeight = FontWeight.Bold) }
+                title = { Text("Profile.", fontSize = 24.sp, fontWeight = FontWeight.Bold) },
             )
         },
         content = { innerPadding ->
@@ -55,7 +59,6 @@ fun ProfileScreen(navController: NavHostController) {
                     .padding(horizontal = 16.dp)
             ) {
                 if (isLoading) {
-                    // Show loading indicator while fetching data
                     Box(
                         modifier = Modifier
                             .fillMaxSize(),
@@ -180,7 +183,6 @@ fun ProfileScreen(navController: NavHostController) {
                         }
                     }
                 } else {
-                    // Handle case where profile data is null (e.g., API failure)
                     Text(
                         text = "Failed to load profile.",
                         fontSize = 16.sp,

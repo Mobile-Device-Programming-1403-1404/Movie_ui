@@ -1,4 +1,4 @@
-package com.example.movie_ui
+package com.example.movie
 
 import org.junit.Test
 

@@ -1,5 +1,7 @@
-package com.example.movie_ui
+package com.example.movie.data
 
+import com.example.movie.model.Movie
+import com.example.movie.model.Profile
 import kotlinx.coroutines.delay
 
 object MockMovieApi {
@@ -12,7 +14,7 @@ object MockMovieApi {
     )
 
     val latestMovies = listOf(
-        Movie("1", "Hitman's Wife's Bodyguard", 3.5f, "Action, Comedy, Crime", "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on another...", "https://example.com/hitman.jpg")
+        Movie("6", "Hitman's Wife's Bodyguard", 3.5f, "Action, Comedy, Crime", "The world's most lethal odd couple - bodyguard Michael Bryce and hitman Darius Kincaid - are back on another...", "https://example.com/hitman.jpg")
     )
 
     private val profile = Profile(
@@ -25,35 +27,31 @@ object MockMovieApi {
     )
 
     val discoverMovies = listOf(
-        Movie("1", "Hitman's Wife's Bodyguard", 3.5f, "Action, Comedy, Crime", "The world's most lethal odd couple...", "https://example.com/hitman.jpg"),
-        Movie("2", "The Incredibles", 4.1f, "Animation, Action, Adventure", "A family of superheroes...", "https://example.com/incredibles.jpg"),
-        Movie("3", "Die Hard", 4.0f, "Action, Thriller", "A cop battles terrorists...", "https://example.com/diehard.jpg"),
-        Movie("4", "Finding Nemo", 4.2f, "Animation, Family", "A clownfish searches for his son...", "https://example.com/nemo.jpg"),
-        Movie("5", "Mission: Impossible", 3.9f, "Action, Thriller", "A spy on an impossible mission...", "https://example.com/missionimpossible.jpg"),
-        Movie("6", "Toy Story", 4.3f, "Animation, Family", "Toys come to life...", "https://example.com/toystory.jpg")
+        Movie("7", "Hitman's Wife's Bodyguard", 3.5f, "Action, Comedy, Crime", "The world's most lethal odd couple...", "https://example.com/hitman.jpg"),
+        Movie("8", "The Incredibles", 4.1f, "Animation, Action, Adventure", "A family of superheroes...", "https://example.com/incredibles.jpg"),
+        Movie("9", "Die Hard", 4.0f, "Action, Thriller", "A cop battles terrorists...", "https://example.com/diehard.jpg"),
+        Movie("10", "Finding Nemo", 4.2f, "Animation, Family", "A clownfish searches for his son...", "https://example.com/nemo.jpg"),
+        Movie("11", "Mission: Impossible", 3.9f, "Action, Thriller", "A spy on an impossible mission...", "https://example.com/missionimpossible.jpg"),
+        Movie("12", "Toy Story", 4.3f, "Animation, Family", "Toys come to life...", "https://example.com/toystory.jpg")
     )
 
-    // Simulate fetching top five movies with a delay
     suspend fun getTopFiveMovies(): List<Movie> {
-        delay(1000) // Simulate network delay of 1 second
+        delay(1000)
         return topFiveMovies
     }
 
-    // Simulate fetching latest movies with a delay
     suspend fun getLatestMovies(): List<Movie> {
-        delay(1000) // Simulate network delay of 1 second
+        delay(1000)
         return latestMovies
     }
 
-    // Simulate fetching profile data with a delay
     suspend fun getProfile(): Profile {
-        delay(1000) // Simulate network delay of 1 second
+        delay(1000)
         return profile
     }
 
-    // Simulate fetching discover movies with a delay, filtered by category
     suspend fun getDiscoverMovies(category: String): List<Movie> {
-        delay(1000) // Simulate network delay of 1 second
+        delay(1000)
         return when (category) {
             "ALL" -> discoverMovies
             "ANIMATION" -> discoverMovies.filter { it.genres.contains("Animation", ignoreCase = true) }

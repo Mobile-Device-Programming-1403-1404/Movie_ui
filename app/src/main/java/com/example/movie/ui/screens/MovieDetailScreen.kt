@@ -1,6 +1,5 @@
-package com.example.movie_ui
+package com.example.movie.ui.screens
 
-import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.*
@@ -19,6 +18,8 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import com.example.movie.model.Movie
+import com.example.movie.ui.components.RatingStars
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
@@ -63,7 +64,7 @@ fun MovieDetailsScreen(movie: Movie, navController: NavHostController) {
                     onClick = { /* Handle download */ },
                     modifier = Modifier.fillMaxWidth(),
                     colors = ButtonDefaults.buttonColors(
-                        containerColor = MaterialTheme.colorScheme.secondary,
+                        containerColor = MaterialTheme.colorScheme.onSecondaryContainer,
                         contentColor = MaterialTheme.colorScheme.onPrimary
                     )
                 ) {
