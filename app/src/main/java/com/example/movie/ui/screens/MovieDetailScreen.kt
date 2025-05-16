@@ -20,7 +20,6 @@ import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
 import coil.compose.AsyncImage
-import coil.compose.AsyncImagePainter
 import com.example.movie.model.Movie
 import com.example.movie.ui.components.RatingStars
 
