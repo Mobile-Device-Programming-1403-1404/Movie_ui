@@ -22,7 +22,8 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiscoverScreen(navController: NavHostController) {
-    var movies by remember { mutableStateOf<List<Movie>>(emptyList()) }
+    var allMovies by remember { mutableStateOf<List<Movie>>(emptyList()) } // Unfiltered movies for tab counts
+    var filteredMovies by remember { mutableStateOf<List<Movie>>(emptyList()) } // Movies after applying search
     var isLoading by remember { mutableStateOf(true) }
     var errorMessage by remember { mutableStateOf("") }
     var selectedTabIndex by remember { mutableStateOf(0) }
@@ -37,9 +38,14 @@ fun DiscoverScreen(navController: NavHostController) {
             isLoading = true
             errorMessage = ""
             try {
-                movies = MockMovieApi.getDiscoverMovies(categories[selectedTabIndex], searchQuery.takeIf { it.isNotBlank() })
+                allMovies = MockMovieApi.getDiscoverMovies(categories[selectedTabIndex], null)
+                filteredMovies = if (searchQuery.isNotBlank()) {
+                    MockMovieApi.getDiscoverMovies(categories[selectedTabIndex], searchQuery)
+                } else {
+                    allMovies
+                }
                 isLoading = false
-                if (movies.isEmpty()) {
+                if (filteredMovies.isEmpty()) {
                     errorMessage = "No movies found"
                 }
             } catch (e: Exception) {
@@ -101,9 +107,9 @@ fun DiscoverScreen(navController: NavHostController) {
                 ) {
                     tabs.forEachIndexed { index, tab ->
                         val count = when (categories[index]) {
-                            "ALL" -> movies.size
-                            "ANIMATION" -> movies.count { it.genres.contains("Animation", ignoreCase = true) }
-                            "ACTION" -> movies.count { it.genres.contains("Action", ignoreCase = true) }
+                            "ALL" -> allMovies.size
+                            "ANIMATION" -> allMovies.count { it.genres.contains("Animation", ignoreCase = true) }
+                            "ACTION" -> allMovies.count { it.genres.contains("Action", ignoreCase = true) }
                             else -> 0
                         }
                         Tab(
@@ -111,7 +117,7 @@ fun DiscoverScreen(navController: NavHostController) {
                             onClick = { selectedTabIndex = index },
                             text = {
                                 Text(
-                                    "$tab ($count)",
+                                    tab,
                                     color = if (selectedTabIndex == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
                                 )
                             }
@@ -141,7 +147,7 @@ fun DiscoverScreen(navController: NavHostController) {
                             style = MaterialTheme.typography.bodyLarge
                         )
                     }
-                } else if (movies.isEmpty()) {
+                } else if (filteredMovies.isEmpty()) {
                     Box(
                         modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
@@ -159,9 +165,11 @@ fun DiscoverScreen(navController: NavHostController) {
                         contentPadding = PaddingValues(16.dp),
                         horizontalArrangement = Arrangement.spacedBy(16.dp),
                         verticalArrangement = Arrangement.spacedBy(16.dp),
-                        modifier = Modifier.fillMaxSize()
+                        modifier = Modifier
+                            .fillMaxSize()
+                            .padding(bottom = 16.dp) // Ensure consistent bottom padding
                     ) {
-                        items(movies) { movie ->
+                        items(filteredMovies) { movie ->
                             MovieGridItem(movie = movie, navController = navController)
                         }
                     }

@@ -72,7 +72,7 @@ dependencies {
     implementation ("org.jetbrains.kotlin:kotlin-parcelize-runtime:1.9.0")
     implementation ("androidx.compose.material:material-icons-extended:1.5.0")
     implementation ("org.jetbrains.kotlinx:kotlinx-coroutines-android:1.6.4")
-
+    implementation("io.coil-kt:coil-compose:2.7.0")
     implementation ("com.squareup.retrofit2:converter-gson:2.11.0")
     implementation ("com.google.code.gson:gson:2.10.1")
 }

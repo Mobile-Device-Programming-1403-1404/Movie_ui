@@ -28,8 +28,12 @@ object MockMovieApi {
         apiService.getLatestMovies()
     }
 
-    suspend fun getDiscoverMovies(category: String, query: String? = null): List<Movie> = withContext(Dispatchers.IO) {
-        apiService.getDiscoverMovies(category, query)
+    suspend fun getDiscoverMovies(category: String, searchQuery: String? = null): List<Movie> = withContext(Dispatchers.IO) {
+        try {
+            apiService.getDiscoverMovies(category, searchQuery)
+        } catch (e: Exception) {
+            emptyList()
+        }
     }
 
     suspend fun getMovieById(id: String): Movie? = withContext(Dispatchers.IO) {

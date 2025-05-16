@@ -9,11 +9,14 @@ import androidx.compose.runtime.Composable
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
 import com.example.movie.model.Movie
 
 @Composable
@@ -25,18 +28,15 @@ fun LatestMovieItem(movie: Movie, navController: NavHostController) {
             .padding(vertical = 8.dp)
             .clickable { navController.navigate("movieDetails/${movie.id}") }
     ) {
-        Box(
+        AsyncImage(
+            model = movie.imageUrl,
+            contentDescription = movie.title,
+            contentScale = ContentScale.Crop,
             modifier = Modifier
                 .weight(0.4f)
                 .fillMaxHeight()
-                .background(Color.DarkGray, RoundedCornerShape(8.dp))
-        ) {
-            Text(
-                text = "Image Placeholder",
-                color = Color.White,
-                modifier = Modifier.align(Alignment.Center)
-            )
-        }
+                .background(Color.DarkGray, RoundedCornerShape(8.dp)),
+        )
 
         Spacer(modifier = Modifier.width(16.dp))
 
@@ -85,6 +85,42 @@ fun LatestMovieItem(movie: Movie, navController: NavHostController) {
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
+            )
+        }
+    }
+}
+
+@Composable
+private fun debugPlaceholder(): @Composable () -> Unit {
+    return {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.DarkGray),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Loading...",
+                color = Color.White,
+                fontSize = 14.sp
+            )
+        }
+    }
+}
+
+@Composable
+private fun errorPlaceholder(): @Composable () -> Unit {
+    return {
+        Box(
+            modifier = Modifier
+                .fillMaxSize()
+                .background(Color.DarkGray),
+            contentAlignment = Alignment.Center
+        ) {
+            Text(
+                text = "Error",
+                color = Color.Red,
+                fontSize = 14.sp
             )
         }
     }

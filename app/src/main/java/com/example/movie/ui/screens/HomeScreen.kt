@@ -15,7 +15,7 @@ import androidx.navigation.NavHostController
 import com.example.movie.api.MockMovieApi
 import com.example.movie.model.Movie
 import com.example.movie.ui.components.LatestMovieItem
-import com.example.movie.ui.components.MovieItem
+import com.example.movie.ui.components.MovieGridItem
 import kotlinx.coroutines.async
 import kotlinx.coroutines.launch
 
@@ -120,7 +120,7 @@ fun HomeScreen(navController: NavHostController) {
                                 horizontalArrangement = Arrangement.spacedBy(16.dp)
                             ) {
                                 items(topFiveMovies) { movie ->
-                                    MovieItem(movie = movie, navController = navController)
+                                    MovieGridItem(movie = movie, navController = navController)
                                 }
                             }
                         }
