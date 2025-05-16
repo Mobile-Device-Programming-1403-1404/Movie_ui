@@ -55,7 +55,7 @@ fun LoginScreen(navController: NavHostController) {
             OutlinedTextField(
                 value = emailOrUsername,
                 onValueChange = { emailOrUsername = it },
-                label = { Text("Email / Username", color = MaterialTheme.colorScheme.onSurface) },
+                label = { Text("Email", color = MaterialTheme.colorScheme.onSurface) },
                 modifier = Modifier.fillMaxWidth(),
                 textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
                 enabled = !isLoading,
