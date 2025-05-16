@@ -3,19 +3,18 @@ package com.example.movie.ui.screens
 import androidx.compose.foundation.layout.*
 import androidx.compose.foundation.lazy.grid.GridCells
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
+import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material.icons.Icons
 import androidx.compose.material.icons.filled.Search
 import androidx.compose.material3.*
 import androidx.compose.runtime.*
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
-import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.movie.data.MockMovieApi
-import com.example.movie.data.NetworkUtils
+import com.example.movie.api.MockMovieApi
 import com.example.movie.model.Movie
 import com.example.movie.ui.components.MovieGridItem
 import kotlinx.coroutines.launch
@@ -23,44 +22,29 @@ import kotlinx.coroutines.launch
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
 fun DiscoverScreen(navController: NavHostController) {
-    // State for movies, loading, selected tab, and search query
     var movies by remember { mutableStateOf<List<Movie>>(emptyList()) }
-    var allMovies by remember { mutableStateOf<List<Movie>>(emptyList()) }
     var isLoading by remember { mutableStateOf(true) }
+    var errorMessage by remember { mutableStateOf("") }
     var selectedTabIndex by remember { mutableStateOf(0) }
     var searchQuery by remember { mutableStateOf("") }
 
-    // Define tabs and their corresponding categories
-    val tabs = listOf("ALL", "ANIMATION", "ACTION")
+    val tabs = listOf("All", "Animation", "Action")
     val categories = listOf("ALL", "ANIMATION", "ACTION")
-
-    // Coroutine scope for launching API calls
     val scope = rememberCoroutineScope()
 
-    // Fetch all movies when the composable is first loaded
-    LaunchedEffect(Unit) {
-        NetworkUtils.fetchData(
-            scope = scope,
-            onLoading = { isLoading = true },
-            onComplete = { data ->
-                allMovies = data
-                movies = data
-                isLoading = false
-            },
-            onError = { isLoading = false },
-            fetch = { MockMovieApi.getDiscoverMovies("ALL") }
-        )
-    }
-
-    // Update movies based on selected tab and search query
     LaunchedEffect(selectedTabIndex, searchQuery) {
         scope.launch {
-            val category = categories[selectedTabIndex]
-            movies = if (searchQuery.isEmpty()) {
-                MockMovieApi.getDiscoverMovies(category)
-            } else {
-                allMovies.filter { it.title.contains(searchQuery, ignoreCase = true) || it.genres.contains(searchQuery, ignoreCase = true) }
-                    .filter { category == "ALL" || it.genres.contains(category, ignoreCase = true) }
+            isLoading = true
+            errorMessage = ""
+            try {
+                movies = MockMovieApi.getDiscoverMovies(categories[selectedTabIndex], searchQuery.takeIf { it.isNotBlank() })
+                isLoading = false
+                if (movies.isEmpty()) {
+                    errorMessage = "No movies found"
+                }
+            } catch (e: Exception) {
+                isLoading = false
+                errorMessage = "Failed to load movies: ${e.message}"
             }
         }
     }
@@ -68,9 +52,17 @@ fun DiscoverScreen(navController: NavHostController) {
     Scaffold(
         topBar = {
             TopAppBar(
-                title = { Text("Discover.", fontSize = 24.sp, fontWeight = FontWeight.Bold) },
+                title = {
+                    Text(
+                        "Discover",
+                        fontSize = 24.sp,
+                        fontWeight = FontWeight.Bold,
+                        color = MaterialTheme.colorScheme.onBackground
+                    )
+                },
                 colors = TopAppBarDefaults.topAppBarColors(
-                    containerColor = MaterialTheme.colorScheme.background
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    titleContentColor = MaterialTheme.colorScheme.onBackground
                 )
             )
         },
@@ -80,24 +72,34 @@ fun DiscoverScreen(navController: NavHostController) {
                     .padding(innerPadding)
                     .fillMaxSize()
             ) {
-                // Search Bar
                 OutlinedTextField(
                     value = searchQuery,
                     onValueChange = { searchQuery = it },
-                    leadingIcon = { Icon(Icons.Default.Search, contentDescription = "Search") },
-                    placeholder = { Text("Search...") },
+                    leadingIcon = {
+                        Icon(
+                            Icons.Default.Search,
+                            contentDescription = "Search",
+                            tint = MaterialTheme.colorScheme.onSurface
+                        )
+                    },
+                    placeholder = { Text("Search movies...") },
                     modifier = Modifier
                         .fillMaxWidth()
                         .padding(horizontal = 16.dp, vertical = 8.dp),
+                    textStyle = LocalTextStyle.current.copy(color = MaterialTheme.colorScheme.onSurface),
                     colors = OutlinedTextFieldDefaults.colors(
-                        focusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
-                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.3f)
+                        focusedBorderColor = MaterialTheme.colorScheme.primary,
+                        unfocusedBorderColor = MaterialTheme.colorScheme.onSurface.copy(alpha = 0.5f),
+                        cursorColor = MaterialTheme.colorScheme.primary
                     )
                 )
 
-                // Tab Row with dynamic counts
-                TabRow(selectedTabIndex = selectedTabIndex) {
-                    tabs.forEachIndexed { index, _ ->
+                TabRow(
+                    selectedTabIndex = selectedTabIndex,
+                    containerColor = MaterialTheme.colorScheme.surface,
+                    contentColor = MaterialTheme.colorScheme.primary
+                ) {
+                    tabs.forEachIndexed { index, tab ->
                         val count = when (categories[index]) {
                             "ALL" -> movies.size
                             "ANIMATION" -> movies.count { it.genres.contains("Animation", ignoreCase = true) }
@@ -107,29 +109,50 @@ fun DiscoverScreen(navController: NavHostController) {
                         Tab(
                             selected = selectedTabIndex == index,
                             onClick = { selectedTabIndex = index },
-                            text = { Text("${categories[index]} ($count)") }
+                            text = {
+                                Text(
+                                    "$tab ($count)",
+                                    color = if (selectedTabIndex == index) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+                                )
+                            }
                         )
                     }
                 }
 
-                // Movie Grid or Loading State
                 if (isLoading) {
                     Box(
-                        modifier = Modifier
-                            .fillMaxSize(),
+                        modifier = Modifier.fillMaxSize(),
                         contentAlignment = Alignment.Center
                     ) {
-                        CircularProgressIndicator()
+                        CircularProgressIndicator(
+                            modifier = Modifier.size(48.dp),
+                            color = MaterialTheme.colorScheme.primary
+                        )
+                    }
+                } else if (errorMessage.isNotEmpty()) {
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = errorMessage,
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.error,
+                            style = MaterialTheme.typography.bodyLarge
+                        )
                     }
                 } else if (movies.isEmpty()) {
-                    Text(
-                        text = "No movies available in this category.",
-                        fontSize = 16.sp,
-                        color = Color.Gray,
-                        modifier = Modifier
-                            .fillMaxSize()
-                            .wrapContentSize(Alignment.Center)
-                    )
+                    Box(
+                        modifier = Modifier.fillMaxSize(),
+                        contentAlignment = Alignment.Center
+                    ) {
+                        Text(
+                            text = "No movies found",
+                            fontSize = 16.sp,
+                            color = MaterialTheme.colorScheme.onBackground.copy(alpha = 0.6f),
+                            style = MaterialTheme.typography.bodyLarge
+                        )
+                    }
                 } else {
                     LazyVerticalGrid(
                         columns = GridCells.Fixed(2),
@@ -138,8 +161,8 @@ fun DiscoverScreen(navController: NavHostController) {
                         verticalArrangement = Arrangement.spacedBy(16.dp),
                         modifier = Modifier.fillMaxSize()
                     ) {
-                        items(movies.size) { index ->
-                            MovieGridItem(movie = movies[index], navController = navController)
+                        items(movies) { movie ->
+                            MovieGridItem(movie = movie, navController = navController)
                         }
                     }
                 }
