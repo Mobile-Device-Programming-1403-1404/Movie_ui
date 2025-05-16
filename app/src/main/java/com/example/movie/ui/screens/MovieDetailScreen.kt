@@ -13,11 +13,14 @@ import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
+import coil.compose.AsyncImage
+import coil.compose.AsyncImagePainter
 import com.example.movie.model.Movie
 import com.example.movie.ui.components.RatingStars
 
@@ -79,24 +82,16 @@ fun MovieDetailsScreen(movie: Movie, navController: NavHostController) {
                 .verticalScroll(rememberScrollState())
                 .fillMaxSize()
         ) {
-            // Backdrop Image
-            Box(
+            AsyncImage(
+                model = movie.imageUrl,
+                contentDescription = "${movie.title} backdrop",
+                contentScale = ContentScale.Crop,
                 modifier = Modifier
                     .fillMaxWidth()
                     .height(250.dp)
-            ) {
-                Box(
-                    modifier = Modifier
-                        .fillMaxSize()
-                        .background(Color.DarkGray)
-                ) {
-                    Text(
-                        text = "Backdrop Image",
-                        color = Color.White,
-                        modifier = Modifier.align(Alignment.Center)
-                    )
-                }
-            }
+                    .background(Color.DarkGray),
+
+            )
 
             Spacer(modifier = Modifier.height(48.dp))
 
@@ -146,7 +141,7 @@ fun MovieDetailsScreen(movie: Movie, navController: NavHostController) {
                         .padding(bottom = 8.dp)
                 )
 
-                if (!showFullDescription) {
+                if (!showFullDescription && movie.description.length > 150) {
                     Text(
                         text = "Read More",
                         color = MaterialTheme.colorScheme.primary,

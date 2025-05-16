@@ -63,7 +63,6 @@ fun DiscoverScreen(navController: NavHostController) {
                         "Discover",
                         fontSize = 24.sp,
                         fontWeight = FontWeight.Bold,
-                        color = MaterialTheme.colorScheme.onBackground
                     )
                 },
                 colors = TopAppBarDefaults.topAppBarColors(
