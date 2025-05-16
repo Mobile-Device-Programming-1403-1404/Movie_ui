@@ -24,7 +24,7 @@ import androidx.navigation.compose.composable
 import androidx.navigation.compose.currentBackStackEntryAsState
 import androidx.navigation.compose.rememberNavController
 import androidx.navigation.navArgument
-import com.example.movie.api.MockMovieApi
+import com.example.movie.api.movieAPI
 import com.example.movie.model.Movie
 import com.example.movie.navigation.BottomNavigationBar
 import com.example.movie.navigation.Destinations
@@ -100,7 +100,7 @@ fun MainScreen(navController: NavHostController) {
 
                 LaunchedEffect(movieId) {
                     withContext(Dispatchers.IO) {
-                        movie = MockMovieApi.getMovieById(movieId)
+                        movie = movieAPI.getMovieById(movieId)
                         isLoading = false
                     }
                 }

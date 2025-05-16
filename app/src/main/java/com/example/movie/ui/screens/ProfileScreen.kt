@@ -17,7 +17,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.platform.LocalContext
-import com.example.movie.api.MockMovieApi
+import com.example.movie.api.movieAPI
 import com.example.movie.model.Profile
 import kotlinx.coroutines.launch
 
@@ -40,7 +40,7 @@ fun ProfileScreen() {
         }
         scope.launch {
             try {
-                profile = MockMovieApi.getProfile()
+                profile = movieAPI.getProfile(userEmail);
                 isLoading = false
                 if (profile == null) {
                     errorMessage = "Profile not found"

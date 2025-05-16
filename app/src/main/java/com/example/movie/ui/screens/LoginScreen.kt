@@ -14,7 +14,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.movie.api.MockMovieApi
+import com.example.movie.api.movieAPI
 import com.example.movie.navigation.Destinations
 import kotlinx.coroutines.launch
 
@@ -119,7 +119,7 @@ fun LoginScreen(navController: NavHostController) {
                         scope.launch {
                             isLoading = true
                             try {
-                                if (MockMovieApi.login(emailOrUsername, password)) {
+                                if (movieAPI.login(emailOrUsername, password)) {
                                     navController.navigate(Destinations.HOME) {
                                         popUpTo(Destinations.LOGIN) { inclusive = true }
                                     }

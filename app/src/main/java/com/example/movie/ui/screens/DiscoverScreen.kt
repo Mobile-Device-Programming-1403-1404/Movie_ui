@@ -15,7 +15,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.movie.api.MockMovieApi
+import com.example.movie.api.movieAPI
 import com.example.movie.model.Movie
 import com.example.movie.ui.components.MovieGridItem
 import kotlinx.coroutines.launch
@@ -39,9 +39,9 @@ fun DiscoverScreen(navController: NavHostController) {
             isLoading = true
             errorMessage = ""
             try {
-                allMovies = MockMovieApi.getDiscoverMovies(categories[selectedTabIndex], null)
+                allMovies = movieAPI.getDiscoverMovies(categories[selectedTabIndex], null)
                 filteredMovies = if (searchQuery.isNotBlank()) {
-                    MockMovieApi.getDiscoverMovies(categories[selectedTabIndex], searchQuery)
+                    movieAPI.getDiscoverMovies(categories[selectedTabIndex], searchQuery)
                 } else {
                     allMovies
                 }

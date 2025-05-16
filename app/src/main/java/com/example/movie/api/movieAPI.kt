@@ -2,15 +2,15 @@ package com.example.movie.api
 
 import com.example.movie.model.LoginRequest
 import com.example.movie.model.Movie
-import com.example.movie.model.MovieApiService
 import com.example.movie.model.Profile
+import com.example.movie.model.ProfileRequest
 import com.example.movie.model.SignUpRequest
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.withContext
 import retrofit2.Retrofit
 import retrofit2.converter.gson.GsonConverterFactory
 
-object MockMovieApi {
+object movieAPI {
     private const val BASE_URL = "http://192.168.204.188:8080/"
 
     private val retrofit = Retrofit.Builder()
@@ -60,10 +60,10 @@ object MockMovieApi {
         response.success
     }
 
-    suspend fun getProfile(): Profile? = withContext(Dispatchers.IO) {
+    suspend fun getProfile(email: String): Profile? = withContext(Dispatchers.IO) {
         try {
-            val profiles = apiService.getProfile()
-            profiles.firstOrNull()
+            val profile = apiService.getProfile(ProfileRequest(email))
+            profile
         } catch (e: Exception) {
             null
         }

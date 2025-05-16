@@ -18,7 +18,7 @@ import androidx.compose.ui.text.input.PasswordVisualTransformation
 import androidx.compose.ui.text.input.VisualTransformation
 import androidx.compose.ui.unit.dp
 import androidx.navigation.NavHostController
-import com.example.movie.api.MockMovieApi
+import com.example.movie.api.movieAPI
 import com.example.movie.navigation.Destinations
 import kotlinx.coroutines.launch
 import retrofit2.HttpException
@@ -243,7 +243,7 @@ fun SignUpScreen(navController: NavHostController) {
                         scope.launch {
                             isLoading = true
                             try {
-                                val success = MockMovieApi.signUp(email, password, username, birthDate, phoneNumber)
+                                val success = movieAPI.signUp(email, password, username, birthDate, phoneNumber)
                                 if (success) {
                                     // Store email in SharedPreferences
                                     val prefs = context.getSharedPreferences("app_prefs", Context.MODE_PRIVATE)

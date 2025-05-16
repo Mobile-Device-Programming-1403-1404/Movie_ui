@@ -1,5 +1,11 @@
-package com.example.movie.model
+package com.example.movie.api
 
+import com.example.movie.model.LoginRequest
+import com.example.movie.model.Movie
+import com.example.movie.model.Profile
+import com.example.movie.model.ProfileRequest
+import com.example.movie.model.SignUpRequest
+import com.example.movie.model.SuccessResponse
 import retrofit2.http.Body
 import retrofit2.http.GET
 import retrofit2.http.POST
@@ -28,6 +34,6 @@ interface MovieApiService {
     @POST("api/signup")
     suspend fun signUp(@Body request: SignUpRequest): SuccessResponse
 
-    @GET("api/user/profile")
-    suspend fun getProfile(): List<Profile>
+    @POST("api/user/profile")
+    suspend fun getProfile(@Body request: ProfileRequest): Profile
 }

@@ -13,7 +13,7 @@ import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.ui.unit.dp
 import androidx.compose.ui.unit.sp
 import androidx.navigation.NavHostController
-import com.example.movie.api.MockMovieApi
+import com.example.movie.api.movieAPI
 import com.example.movie.model.Movie
 import com.example.movie.ui.components.LatestMovieItem
 import com.example.movie.ui.components.MovieGridItem
@@ -33,8 +33,8 @@ fun HomeScreen(navController: NavHostController) {
         scope.launch {
             try {
                 // Fetch both lists concurrently
-                val topFiveDeferred = scope.async { MockMovieApi.getTopFiveMovies() }
-                val latestDeferred = scope.async { MockMovieApi.getLatestMovies() }
+                val topFiveDeferred = scope.async { movieAPI.getTopFiveMovies() }
+                val latestDeferred = scope.async { movieAPI.getLatestMovies() }
                 topFiveMovies = topFiveDeferred.await()
                 latestMovies = latestDeferred.await()
                 isLoading = false
